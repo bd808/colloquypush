@@ -713,12 +713,19 @@ public:
 	}
 
 	bool Test(const CString& sKeyWord, const CString& sString) {
-		return (!sKeyWord.empty() && (
-			sString.Equals(sKeyWord + " ", false, sKeyWord.length() +1)
-			|| sString.Right(sKeyWord.length() +1).Equals(" " + sKeyWord)
-			|| sString.AsLower().WildCmp("* " + sKeyWord.AsLower() + " *")
-			|| (sKeyWord.find_first_of("*?") != CString::npos && sString.AsLower().WildCmp(sKeyWord.AsLower()))
-		));
+    if (sKeyWord.empty()) {
+      return false;
+    }
+    CString msg = " " + sString.AsLower() + " ";
+    CString value = sKeyWord.AsLower();
+
+    if ('_' == value[0]) {
+      // user wants white space matching (why?)
+      value = " " + value.LeftChomp_n(1) + " ";
+    }
+
+    value = "*" + value + "*";
+    return msg.WildCmp(value);
 	}
 
 	bool Push(const CString& sNick, const CString& sMessage, const CString& sChannel, bool bHilite, int iBadge) {
@@ -801,7 +808,7 @@ public:
 			if (bHilite) {
 				// Test our current irc nick
 				const CString& sMyNick(GetNetwork()->GetIRCNick().GetNick());
-				bool bMatches = Test(sMyNick, sMessage) || Test(sMyNick + "?*", sMessage);
+				bool bMatches = Test(sMyNick, sMessage);
 
 				// If our nick didn't match, test the list of keywords for this device
 				if (!bMatches) {

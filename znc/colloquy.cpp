@@ -782,7 +782,7 @@ public:
 		}
 
 		bool bRet = true;
-		vector<CClient*>& vpClients = GetNetwork()->GetClients();
+		const vector<CClient*> & vpClients = GetNetwork()->GetClients();
 
 		// Cycle through all of the cached devices
 		for (map<CString, CDevice*>::iterator it = m_mspDevices.begin(); it != m_mspDevices.end(); it++) {
@@ -791,7 +791,7 @@ public:
 			// Determine if this cached device has a client still connected
 			bool bFound = false;
 
-			for (vector<CClient*>::size_type a = 0; a < vpClients.size(); a++) {
+			for (size_t a = 0; a < vpClients.size(); a++) {
 				if (pDevice->HasClient(vpClients[a])) {
 					bFound = true;
 					break;
